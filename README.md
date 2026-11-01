@@ -91,3 +91,28 @@ The Flint run used `REPS=25` so prefill lasted long enough for macmon to sample.
 `runs/<dir>/` holds `env.txt` (machine, versions, model sha256), `phases.jsonl` (UTC
 windows), `pp.json` / `tg.json` (llama-bench output), `macmon.jsonl` (raw 2 Hz
 samples) and `summary.json`.
+
+## Vision encoders: SigLIP 2 (PyTorch MPS, `siglip_bench.py`)
+
+Vision tower only, random pixels at native resolution, ~8 s timed loop per config.
+TFLOP/s = 2 × vision params × patch tokens × images/s (ignores attention FLOPs,
+which add ~4–6% here). % is of the 16.2 TFLOP/s fp32 peak.
+
+| model | vision params | tokens/img | config | images/s | ≈TFLOP/s | GPU W | RAM W |
+|---|---|---|---|---|---|---|---|
+| siglip2-base-patch16-224 | 93M | 196 | fp16, batch 1 | 149 | 5.4 (33%) | 24.7 | 2.1 |
+| | | | fp16, batch 32 | **325** | 11.8 (73%) | 54.8 | 2.7 |
+| siglip2-giant-opt-patch16-384 | 1,164M | 576 | fp16, batch 1 | 8.1 | 10.8 (67%) | 43.6 | 1.9 |
+| | | | fp16, batch 32 | **9.6** | 12.9 (79%) | 61.4 | 6.5 |
+
+fp32 is ~10–20% slower throughout (full table in `runs/*siglip*/results.json`).
+
+- **Compute-bound, like LLM prefill:** low RAM power, high GPU power. The giant model
+  reaches ~79% of fp32 peak, close to LLM prefill and the plain matmul.
+- **Small models at batch 1 are overhead-bound:** base at batch 1 uses only ~33% of
+  peak (7 ms/image is mostly launch/framework cost); batching to 32 more than doubles
+  throughput. The giant is big enough to keep the GPU fed even at batch 1.
+- **fp16 ≈ fp32 speed:** the gain is small, consistent with the GPU's fp16 and fp32 ALU
+  rates being similar on this chip; fp16 mainly saves memory and power.
+- Zero-shot sanity check (`zeroshot.txt`): both models rank a park photo, an interior
+  with plants, and a book page correctly among six labels.

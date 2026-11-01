@@ -1,0 +1,50 @@
+[
+  {
+    "dtype": "fp32",
+    "batch": 1,
+    "iters": 1132,
+    "seconds": 8.016,
+    "images_per_s": 141.22,
+    "ms_per_batch": 7.08
+  },
+  {
+    "dtype": "fp32",
+    "batch": 8,
+    "iters": 256,
+    "seconds": 8.111,
+    "images_per_s": 252.51,
+    "ms_per_batch": 31.68
+  },
+  {
+    "dtype": "fp32",
+    "batch": 32,
+    "iters": 72,
+    "seconds": 8.258,
+    "images_per_s": 279.01,
+    "ms_per_batch": 114.69
+  },
+  {
+    "dtype": "fp16",
+    "batch": 1,
+    "iters": 1192,
+    "seconds": 8.014,
+    "images_per_s": 148.74,
+    "ms_per_batch": 6.72
+  },
+  {
+    "dtype": "fp16",
+    "batch": 8,
+    "iters": 292,
+    "seconds": 8.076,
+    "images_per_s": 289.24,
+    "ms_per_batch": 27.66
+  },
+  {
+    "dtype": "fp16",
+    "batch": 32,
+    "iters": 84,
+    "seconds": 8.266,
+    "images_per_s": 325.17,
+    "ms_per_batch": 98.41
+  }
+]

@@ -1,0 +1,3 @@
+2026-10-31_142001.jpg: a city park with trees 0.001 | a screenshot of text 0.000 | a motorcycle 0.000
+2026-10-31_070708.jpg: a living room with plants 0.001 | a cat 0.000 | a screenshot of text 0.000
+14-01-51-7f4c0ae0-6e89-4e5f-91f0-e2f8c314f38f-photo-AQAD9SBrG96WMUt-.jpg: a screenshot of text 0.006 | a cat 0.000 | a plate of food 0.000
