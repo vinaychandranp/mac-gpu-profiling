@@ -10,6 +10,7 @@ Prefill vs decode for a dense and an MoE LLM on an Apple M4 Max, measured with
 |---|---|
 | machine | Mac Studio (Mac16,9), Apple M4 Max, 40-core GPU |
 | memory | 48 GB unified, ~546 GB/s peak (Apple spec) |
+| GPU fp32 peak | 40 cores × 128 ALUs × 2 (FMA) × 1.578 GHz (clock measured by macmon) ≈ **16.2 TFLOP/s** |
 | OS | macOS 26.6.2 (25G83) |
 | llama.cpp | 0.8.0 (build 11960, commit 8642541b2), Homebrew, Metal, `-ngl 99` |
 | macmon | 0.10.0, `macmon pipe -i 500` (2 Hz) |
@@ -37,7 +38,7 @@ window** (first second dropped).
 | Flint | decode | 117.1 ± 1.5 | 100% | **19.9** | 9.5 | 117 × 1.66 GB ≈ **194 GB/s = 36% of peak** |
 
 Reference points: an 8192² fp32 MPS matmul loop ran at 13.4 TFLOP/s, GPU 100% @ 1578 MHz,
-~66 W. ANE power was 0.0 W in every phase (llama.cpp's Metal backend does not use it).
+~66 W, i.e. **83% of the 16.2 TFLOP/s fp32 peak**. ANE power was 0.0 W in every phase (llama.cpp's Metal backend does not use it).
 
 ## What it shows
 
@@ -46,8 +47,8 @@ Reference points: an 8192² fp32 MPS matmul loop ran at 13.4 TFLOP/s, GPU 100% @
    in the power: prefill is GPU-heavy (59 W GPU, 3 W DRAM); decode drops GPU power by
    a third and DRAM power rises ~6× (40 W / 19 W). Qwen decode reaches ~76% of peak
    bandwidth, about what a well-tuned memory-bound kernel gets.
-2. **Dense prefill sits at the compute ceiling.** 13.6 TFLOP/s by 2·N·tok/s, the same
-   as the plain fp32 matmul test.
+2. **Dense prefill is compute-bound.** 13.6 TFLOP/s by 2·N·tok/s = ~84% of the 16.2 TFLOP/s
+   fp32 peak, the same as the plain fp32 matmul test (13.4).
 3. **MoE decode is 5× faster but NOT bandwidth-bound.** Flint reads ~11× fewer bytes per
    token than Qwen, yet decodes only ~5× faster, using ~36% of peak bandwidth, with
    *lower* GPU and DRAM power than dense decode. At batch 1 something other than raw
