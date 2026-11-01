@@ -32,7 +32,7 @@ window** (first second dropped).
 
 | model | phase | tok/s | GPU busy | GPU W | **RAM W** | derived |
 |---|---|---|---|---|---|---|
-| Qwen3.8-27B | prefill | 252.6 ± 0.1 | 100% | **59.3** | 2.9 | 2·N·tok/s ≈ **13.6 TFLOP/s** |
+| Qwen3.8-27B | prefill | 252.6 ± 0.1 | 100% | **59.3** | 2.9 | 2·N_matmul·tok/s ≈ **12.3–12.9 TFLOP/s** (see note) |
 | Qwen3.8-27B | decode | 22.7 ± 0.0 | 100% | **40.2** | **18.6** | 22.7 × 18.25 GB ≈ **415 GB/s = 76% of peak** |
 | Flint | prefill | 1798 ± 5 | 100% | 51.5 | 5.9 | 2·N_active·tok/s ≈ 9.5 TFLOP/s (N_active ≈ 2.65B, rough) |
 | Flint | decode | 117.1 ± 1.5 | 100% | **19.9** | 9.5 | 117 × 1.66 GB ≈ **194 GB/s = 36% of peak** |
@@ -47,8 +47,14 @@ Reference points: an 8192² fp32 MPS matmul loop ran at 13.4 TFLOP/s, GPU 100% @
    in the power: prefill is GPU-heavy (59 W GPU, 3 W DRAM); decode drops GPU power by
    a third and DRAM power rises ~6× (40 W / 19 W). Qwen decode reaches ~76% of peak
    bandwidth, about what a well-tuned memory-bound kernel gets.
-2. **Dense prefill is compute-bound.** 13.6 TFLOP/s by 2·N·tok/s = ~84% of the 16.2 TFLOP/s
-   fp32 peak, the same as the plain fp32 matmul test (13.4).
+2. **Dense prefill is compute-bound.** ~12.3–12.9 TFLOP/s = **76–80% of the 16.2 TFLOP/s
+   fp32 peak**, just under the plain fp32 matmul test (13.4, 83%), as expected once
+   dequantization, norms, activations and launch gaps are added.
+   *Note on N:* the naive 2·26.9B·tok/s gives 13.6 TFLOP/s, which would beat the plain
+   matmul. That is a counting error: the token embedding (248,320 × 5,120 = 1.27B params)
+   is a lookup with no FLOPs (→ 25.6B, 12.9 TFLOP/s), and the output head (another 1.27B)
+   likely runs only for the last prompt token in llama-bench's pp test (→ 24.4B,
+   12.3 TFLOP/s). Attention FLOPs, ignored here, add a little back.
 3. **MoE decode is 5× faster but NOT bandwidth-bound.** Flint reads ~11× fewer bytes per
    token than Qwen, yet decodes only ~5× faster, using ~36% of peak bandwidth, with
    *lower* GPU and DRAM power than dense decode. At batch 1 something other than raw
