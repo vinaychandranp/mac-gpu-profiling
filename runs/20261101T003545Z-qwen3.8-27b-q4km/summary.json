@@ -1,0 +1,44 @@
+{
+  "run": "20261101T003545Z-qwen3.8-27b-q4km",
+  "env": {
+    "date_utc": "2026-11-01T00:35:45.305906+00:00",
+    "machine": "Mac16,9 / Apple M4 Max",
+    "gpu": "40 cores",
+    "memory_bytes": "51539607552",
+    "os": "macOS 26.6.2 (25G83)",
+    "llama.cpp": "version: 0.8.0 (build 11960, commit 8642541b2)",
+    "macmon": "macmon 0.10.0",
+    "model": "/Users/pondenkandath/models/Qwen3.8-27B-Q4_K_M.gguf",
+    "model_bytes": "18973870528",
+    "model_sha256": "c600de0300ae8a0eb3a6c0b8b5561b8b96f16bd2c863c2a66c42de29d391a747",
+    "params": "PP=512 TG=128 REPS=3 ngl=99"
+  },
+  "phases": {
+    "pp": {
+      "tok_s": 252.55,
+      "tok_s_sd": 0.14,
+      "n_params": 26895998464,
+      "model_bytes": 18962876416,
+      "samples": 17,
+      "gpu_busy": 1.0,
+      "gpu_mhz": 1578,
+      "gpu_W": 59.32,
+      "ram_W": 2.86,
+      "all_W": 61.78,
+      "ane_W": 0.0
+    },
+    "tg": {
+      "tok_s": 22.74,
+      "tok_s_sd": 0.04,
+      "n_params": 26895998464,
+      "model_bytes": 18962876416,
+      "samples": 33,
+      "gpu_busy": 1.0,
+      "gpu_mhz": 1578,
+      "gpu_W": 40.15,
+      "ram_W": 18.64,
+      "all_W": 42.4,
+      "ane_W": 0.0
+    }
+  }
+}

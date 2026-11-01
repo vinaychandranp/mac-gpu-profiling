@@ -1,0 +1,4 @@
+runs/*/macmon.jsonl.tmp
+.DS_Store
+*.gguf
+.venv/
